@@ -33,27 +33,17 @@ namespace SharpSteam
         public String ReadShortcuts(string userPath)
         {
             string shortcutFile = userPath + "\\config\\shortcuts.vdf";
-            string text = String.Empty;
+            string content = String.Empty;
+
             if (File.Exists(shortcutFile))
             {
                 using (StreamReader reader = new StreamReader(shortcutFile))
                 {
-                    text = reader.ReadToEnd();
+                    content = reader.ReadToEnd();
                 }
             }
 
-            List<SteamGame> game = new List<SteamGame>();
-            string[] q = Regex.Split(text, @"\x00");
-            if (!String.IsNullOrEmpty(text))
-            {
-
-            }
-
-            using (StreamWriter w = new StreamWriter("x.txt"))
-            {
-                w.Write(text);
-            }
-            return text;
+            return content;
         }
     }
 }
