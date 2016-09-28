@@ -1,6 +1,8 @@
 ﻿using System;
-namespace VDFParser {
-    public class Shared {
+namespace VDFParser
+{
+    public class Shared
+    {
         public static readonly byte[] VDFHeader = { 0x00, 0x73, 0x68, 0x6F, 0x72, 0x74, 0x63, 0x75, 0x74, 0x73, 0x00 };
     }
 }

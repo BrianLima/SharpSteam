@@ -1,10 +1,10 @@
-﻿namespace VDFParser.Models {
-
+﻿namespace VDFParser.Models
+{
     /// <summary>
     /// Represents a VDF entry
     /// </summary>
-    public class VDFEntry {
-
+    public class VDFEntry
+    {
         /// <summary>
         /// Gets or sets the index.
         /// </summary>
@@ -78,14 +78,15 @@
         /// Gets or sets a list of tags for the application
         /// </summary>
         /// <value>Tags list for the application</value>
-        [VDFField("tags", Type=VDFFieldType.IndexedArray)]
+        [VDFField("tags", Type = VDFFieldType.IndexedArray)]
         public string[] Tags { get; set; }
 
         /// <summary>
         /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:VDFParser.Models.VDFEntry"/>.
         /// </summary>
         /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:VDFParser.Models.VDFEntry"/>.</returns>
-        public override string ToString() {
+        public override string ToString()
+        {
             return string.Format("[VDFEntry: AppName={0}, Exe={1}, StartDir={2}, Icon={3}, ShortcutPath={4}, IsHidden={5}, AllowDesktopConfig={6}, OpenVR={7}, Tags={8}]", AppName, Exe, StartDir, Icon, ShortcutPath, IsHidden, AllowDesktopConfig, OpenVR, Tags == null ? "(null)" : string.Join(", ", Tags));
         }
     }

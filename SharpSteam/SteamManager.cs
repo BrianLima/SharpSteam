@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using VDFParser;
+using VDFParser.Models;
 
 namespace SharpSteam
 {
@@ -30,20 +32,31 @@ namespace SharpSteam
             return Directory.GetDirectories(steamInstallPath + "\\userdata").ToList<String>();
         }
 
-        public String ReadShortcuts(string userPath)
+        public VDFEntry[] ReadShortcuts(string userPath)
         {
             string shortcutFile = userPath + "\\config\\shortcuts.vdf";
-            string content = String.Empty;
+            VDFEntry[] shortcuts = null;
 
-            if (File.Exists(shortcutFile))
+            using (StreamReader reader = new StreamReader(shortcutFile))
             {
-                using (StreamReader reader = new StreamReader(shortcutFile))
-                {
-                    content = reader.ReadToEnd();
-                }
+                shortcuts = VDFParser.VDFParser.Parse(reader.ReadToEnd());
             }
 
-            return content;
+            return shortcuts;
+        }
+
+        public void WriteShortcuts(VDFEntry[] vdf, string vdfPath)
+        {
+            byte[] result = VDFSerializer.Serialize(vdf);
+
+            try
+            {
+                File.WriteAllBytes(vdfPath, result);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
     }
 }

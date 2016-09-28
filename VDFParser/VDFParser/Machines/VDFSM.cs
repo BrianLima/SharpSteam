@@ -3,13 +3,15 @@ using System.Linq;
 using System.Collections.Generic;
 using VDFParser.Models;
 
-namespace VDFParser.Machines {
-
+namespace VDFParser.Machines
+{
     /// <summary>
     /// State machine used to parse a VDF structure
     /// </summary>
-    public class VDFSM {
-        enum MainSMState {
+    public class VDFSM
+    {
+        enum MainSMState
+        {
             IndexBeginIndicator,    // 0x00
             IndexValue,             // [^0x00]+
             IndexEndIndicator,      // 0x00
@@ -30,8 +32,10 @@ namespace VDFParser.Machines {
         /// Gets the parsed entries
         /// </summary>
         /// <value>The entries.</value>
-        public VDFEntry[] Entries {
-            get {
+        public VDFEntry[] Entries
+        {
+            get
+            {
                 return entries.ToArray();
             }
         }
@@ -39,7 +43,8 @@ namespace VDFParser.Machines {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:VDFParser.Machines.VDFSM"/> class.
         /// </summary>
-        public VDFSM() {
+        public VDFSM()
+        {
             entries = new List<VDFEntry>();
             tmpBuffer = new List<byte>();
             mainState = MainSMState.IndexBeginIndicator;
@@ -51,8 +56,10 @@ namespace VDFParser.Machines {
         /// <summary>
         /// Flushes any remaining entry to the result array
         /// </summary>
-        public void Flush() {
-            if(currentEntry != null) {
+        public void Flush()
+        {
+            if (currentEntry != null)
+            {
                 Console.WriteLine("Parsed " + currentEntry);
                 entries.Add(currentEntry);
             }
@@ -63,10 +70,13 @@ namespace VDFParser.Machines {
         /// Feeds a given byte to the SM
         /// </summary>
         /// <param name="b">Incoming byte to be fed to the SM</param>
-        public void Feed(byte b) {
-            switch(mainState) {
+        public void Feed(byte b)
+        {
+            switch (mainState)
+            {
                 case MainSMState.IndexBeginIndicator:
-                    if(b == 0x00) {
+                    if (b == 0x00)
+                    {
                         Flush();
                         mainState = MainSMState.IndexValue;
                         tmpBuffer.Clear();
@@ -74,13 +84,15 @@ namespace VDFParser.Machines {
                     }
                     break;
                 case MainSMState.IndexValue:
-                    if(b == 0x00) { // Okay, next would be IndexEndIndicator, 
-                                    // but the terminator is also the separator, 
-                                    // and things would get messy. Let's just
-                                    // skip a whole SM step here and pretend
-                                    // everything is fine.
+                    if (b == 0x00)
+                    { // Okay, next would be IndexEndIndicator, 
+                      // but the terminator is also the separator, 
+                      // and things would get messy. Let's just
+                      // skip a whole SM step here and pretend
+                      // everything is fine.
                         int indexResult;
-                        if(int.TryParse(tmpBuffer.StringFromByteArray(), out indexResult)) {
+                        if (int.TryParse(tmpBuffer.StringFromByteArray(), out indexResult))
+                        {
                             currentEntry = new VDFEntry();
                             currentEntry.Index = indexResult;
                             mainState = MainSMState.Fields;
@@ -93,8 +105,10 @@ namespace VDFParser.Machines {
                     tmpBuffer.Add(b);
                     break;
                 case MainSMState.Fields:
-                    if(fieldsSM.Feed(b)) {
-                        foreach(KeyValuePair<string, byte[]> k in fieldsSM.Fields) {
+                    if (fieldsSM.Feed(b))
+                    {
+                        foreach (KeyValuePair<string, byte[]> k in fieldsSM.Fields)
+                        {
                             FillEntry(k.Key, k.Value);
                         }
                         mainState = MainSMState.IndexBeginIndicator;
@@ -104,24 +118,33 @@ namespace VDFParser.Machines {
         }
 
 
-        void FillEntry(string fieldName, byte[] value) {
+        void FillEntry(string fieldName, byte[] value)
+        {
             var props = from p in entryType.GetProperties()
                         where Attribute.IsDefined(p, typeof(VDFField))
                         where p.Name.Equals(fieldName, StringComparison.InvariantCultureIgnoreCase)
                         select p;
             var prop = props.FirstOrDefault();
-            if(prop == null) {
+            if (prop == null)
+            {
                 return;
             }
 
             object result = null;
-            if(prop.PropertyType == typeof(int)) {
+            if (prop.PropertyType == typeof(int))
+            {
                 result = BitConverter.ToInt32(value, 0);
-            } else if(prop.PropertyType == typeof(string)) {
+            }
+            else if (prop.PropertyType == typeof(string))
+            {
                 result = value.StringFromByteArray();
-            } else if(prop.PropertyType.IsArray && prop.PropertyType.GetElementType() == typeof(string)) {
+            }
+            else if (prop.PropertyType.IsArray && prop.PropertyType.GetElementType() == typeof(string))
+            {
                 result = parseIndexedArray(value);
-            } else {
+            }
+            else
+            {
                 Console.WriteLine("Unable to deserialize field '" + fieldName + "': Not Implemented.");
                 return;
             }
@@ -129,8 +152,10 @@ namespace VDFParser.Machines {
             prop.SetValue(currentEntry, result);
         }
 
-        string[] parseIndexedArray(byte[] input) {
-            if(input.Length < 5) {
+        string[] parseIndexedArray(byte[] input)
+        {
+            if (input.Length < 5)
+            {
                 return new string[] { };
             }
             arraySM.Reset();

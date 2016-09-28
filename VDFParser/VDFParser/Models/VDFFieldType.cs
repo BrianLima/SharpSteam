@@ -1,5 +1,7 @@
-﻿namespace VDFParser.Models {
-    public enum VDFFieldType {
+﻿namespace VDFParser.Models
+{
+    public enum VDFFieldType
+    {
         String,
         Integer,
         IndexedArray

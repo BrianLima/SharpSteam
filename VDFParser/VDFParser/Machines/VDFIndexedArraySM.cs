@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
-namespace VDFParser.Machines {
+namespace VDFParser.Machines
+{
 
     /// <summary>
     /// State Machine used to parse an indexed array from the VDF structure
     /// </summary>
-    public class VDFIndexedArraySM {
-        enum State {
+    public class VDFIndexedArraySM
+    {
+        enum State
+        {
             IndexIdentifier,
             Index,
             Value
@@ -18,8 +21,10 @@ namespace VDFParser.Machines {
         /// Gets the parsed array.
         /// </summary>
         /// <value>The parsed array.</value>
-        public string[] ParsedArray {
-            get {
+        public string[] ParsedArray
+        {
+            get
+            {
                 return result.ToArray();
             }
         }
@@ -27,7 +32,8 @@ namespace VDFParser.Machines {
         /// <summary>
         /// Resets this instance, cleaning all parsed results
         /// </summary>
-        public void Reset() {
+        public void Reset()
+        {
             result.Clear();
             tmpBuffer.Clear();
             state = State.IndexIdentifier;
@@ -36,16 +42,19 @@ namespace VDFParser.Machines {
         /// <summary>
         /// Flushes any remaining field to the result array
         /// </summary>
-        public void Flush() {
-            if(tmpBuffer.Count > 0) {
+        public void Flush()
+        {
+            if (tmpBuffer.Count > 0)
+            {
                 result.Add(tmpBuffer.StringFromByteArray());
             }
         }
-            
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:VDFParser.Machines.VDFIndexedArraySM"/> class.
         /// </summary>
-        public VDFIndexedArraySM() {
+        public VDFIndexedArraySM()
+        {
             result = new List<string>();
             tmpBuffer = new List<byte>();
         }
@@ -54,17 +63,21 @@ namespace VDFParser.Machines {
         /// Feeds a given byte to the SM
         /// </summary>
         /// <param name="b">Incoming byte to be fed to the SM</param>
-        public void Feed(byte b) {
-            switch(state) {
+        public void Feed(byte b)
+        {
+            switch (state)
+            {
                 case State.IndexIdentifier:
-                    if(b == 0x01) {
+                    if (b == 0x01)
+                    {
                         state = State.Index;
                         Flush();
                         tmpBuffer.Clear();
                     }
                     break;
                 case State.Index:
-                    if(b == 0x00) {
+                    if (b == 0x00)
+                    {
                         // Look! Is this an index metadata we're getting rid of?
                         tmpBuffer.Clear();
                         state = State.Value;
@@ -72,7 +85,8 @@ namespace VDFParser.Machines {
                     // tmpBuffer.Add(b); 
                     break;
                 case State.Value:
-                    if(b == 0x00) {
+                    if (b == 0x00)
+                    {
                         result.Add(tmpBuffer.StringFromByteArray());
                         tmpBuffer.Clear();
                         state = State.IndexIdentifier;
@@ -93,8 +107,10 @@ namespace VDFParser.Machines {
         /// Feeds a given byte array to the SM
         /// </summary>
         /// <param name="b">Incoming byte array to be fed to the SM</param>
-        public void Feed(byte[] input) {
-            foreach(var b in input) {
+        public void Feed(byte[] input)
+        {
+            foreach (var b in input)
+            {
                 Feed(b);
             }
         }
