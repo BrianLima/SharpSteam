@@ -11,9 +11,9 @@ using VDFParser.Models;
 
 namespace SharpSteam
 {
-    public class SteamManager
+    public static class SteamManager
     {
-        public string GetSteamFolder()
+        public static string GetSteamFolder()
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey("Software\\Valve\\Steam");
             if (key == null)
@@ -27,25 +27,34 @@ namespace SharpSteam
         /// </summary>
         /// <param name="steamInstallPath">Steam's current installed path</param>
         /// <returns>ListString of users path</returns>
-        public List<String> GetUsers(string steamInstallPath)
+        public static String[] GetUsers(string steamInstallPath)
         {
-            return Directory.GetDirectories(steamInstallPath + "\\userdata").ToList<String>();
+            return Directory.GetDirectories(steamInstallPath + "\\userdata");
         }
 
-        public VDFEntry[] ReadShortcuts(string userPath)
+        public static VDFEntry[] ReadShortcuts(string userPath)
         {
             string shortcutFile = userPath + "\\config\\shortcuts.vdf";
-            VDFEntry[] shortcuts = null;
+            VDFEntry[] shortcuts = new VDFEntry[0];
 
-            using (StreamReader reader = new StreamReader(shortcutFile))
+            //Some users don't seem to have the config directory at all, do nothing for these
+            if (!Directory.Exists(userPath + "\\config\\"))
             {
-                shortcuts = VDFParser.VDFParser.Parse(reader.ReadToEnd());
+                return null;
             }
+
+            //Users that don't have any shortcut for some reason don't even have this file in their config folder
+            if (!File.Exists(shortcutFile))
+            {
+                File.Create(shortcutFile);
+            }
+
+            shortcuts = VDFParser.VDFParser.Parse(shortcutFile);
 
             return shortcuts;
         }
 
-        public void WriteShortcuts(VDFEntry[] vdf, string vdfPath)
+        public static void WriteShortcuts(VDFEntry[] vdf, string vdfPath)
         {
             byte[] result = VDFSerializer.Serialize(vdf);
 
