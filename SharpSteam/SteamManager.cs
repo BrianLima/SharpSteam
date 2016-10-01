@@ -37,16 +37,10 @@ namespace SharpSteam
             string shortcutFile = userPath + "\\config\\shortcuts.vdf";
             VDFEntry[] shortcuts = new VDFEntry[0];
 
-            //Some users don't seem to have the config directory at all, do nothing for these
-            if (!Directory.Exists(userPath + "\\config\\"))
+            //Some users don't seem to have the config directory at all or the shortcut file, return a empty entry for those
+            if (!Directory.Exists(userPath + "\\config\\") || !File.Exists(shortcutFile))
             {
-                return null;
-            }
-
-            //Users that don't have any shortcut for some reason don't even have this file in their config folder
-            if (!File.Exists(shortcutFile))
-            {
-                File.Create(shortcutFile);
+                return shortcuts;
             }
 
             shortcuts = VDFParser.VDFParser.Parse(shortcutFile);
