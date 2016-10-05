@@ -1,11 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using VDFParser;
 using VDFParser.Models;
 
@@ -13,6 +8,10 @@ namespace SharpSteam
 {
     public static class SteamManager
     {
+        /// <summary>
+        /// Returns Steam's current installed path
+        /// </summary>
+        /// <returns></returns>
         public static string GetSteamFolder()
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey("Software\\Valve\\Steam");
